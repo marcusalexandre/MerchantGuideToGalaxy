@@ -7,14 +7,22 @@ namespace MerchantGuideToGalaxy.UnitTest
     /// <summary>
     /// Testes de Conversão
     /// </summary>
-    public class ConverterTest
+    public class IntergalaticConverterTest
     {
         private readonly IntergalaticConverter _intergalaticConverter;
-        public ConverterTest()
+
+        public IntergalaticConverterTest()
         {
             _intergalaticConverter = new IntergalaticConverter();
-        }
+            _intergalaticConverter.AddQuotationDirt("glob", "I");
+            _intergalaticConverter.AddQuotationDirt("prok", "V");
+            _intergalaticConverter.AddQuotationDirt("pish", "X");
+            _intergalaticConverter.AddQuotationDirt("tegj", "L");
 
+            _intergalaticConverter.AddQuotationMetal("Silver", 17M);
+            _intergalaticConverter.AddQuotationMetal("Iron", 195.5M);
+            _intergalaticConverter.AddQuotationMetal("Gold", 14450M);
+        }
 
         /// <summary>
         /// Conversão de algarismos romanos para decimais

@@ -1,5 +1,8 @@
 ﻿using MerchantGuideToGalaxy.Core.RomanExpressions;
 using MerchantGuideToGalaxy.Core.IntergalaticExpressions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MerchantGuideToGalaxy.Core
 {
@@ -9,6 +12,9 @@ namespace MerchantGuideToGalaxy.Core
     /// </summary>
     public class IntergalaticConverter
     {
+        private readonly IList<IntergalaticExpression> _intergalaticExpressions = new List<IntergalaticExpression>();
+        private readonly IDictionary<string, string> _quotationsDirt = new Dictionary<string, string>();
+
         private static readonly RomanExpression[] RomanExpressionTree =
             new RomanExpression[] {
                 new ThousandExpression(),
@@ -17,14 +23,12 @@ namespace MerchantGuideToGalaxy.Core
                 new OneExpression()
             };
 
-        private static readonly IntergalaticExpression[] IntergalaticExpressionTree =
-            new IntergalaticExpression[]
-        {
-                new GoldExpression(),
-                new SilverExpression(),
-                new IronExpression(),
-                new EmptyExpression()
-        };
+
+        public void AddQuotationDirt(string dirtValue, string romanValue)
+            => _quotationsDirt[dirtValue] = romanValue;
+
+        public void AddQuotationMetal(string metalValue, decimal multiplier)
+            => _intergalaticExpressions.Add(new CustomExpression(metalValue, multiplier));
 
 
         /// <summary>
@@ -46,16 +50,31 @@ namespace MerchantGuideToGalaxy.Core
         public string ConvertIntergalaticToRoman(string intergalatic)
         {
             var context = new Context<string>(intergalatic);
-            foreach (var expression in IntergalaticExpressionTree)
+            foreach (var customExpression in _intergalaticExpressions)
             {
-                if (context.Input.Contains(expression.Name()))
+                if (context.Input.Contains(customExpression.Name()))
                 {
-                    expression.Interpret(context);
+                    customExpression.Interpret(context, _quotationsDirt);
                     break;
                 }
             }
+            var expression = new EmptyExpression();
+            expression.Interpret(context, _quotationsDirt);
             return context.Output;
         }
+
+
+        /// <summary>
+        /// Retorna fator de cotação do metal
+        /// </summary>
+        public decimal GetQuotationMetal(string metal)
+            => _intergalaticExpressions.Single(e => e.Name() == metal).Multiplier();
+
+        /// <summary>
+        /// Retorna verdade se o valor é uma terra
+        /// </summary>
+        public bool IsDirt(string value)
+            => _quotationsDirt.ContainsKey(value);
 
         /// <summary>
         /// Intergalático para decimal com metais
@@ -63,16 +82,16 @@ namespace MerchantGuideToGalaxy.Core
         public decimal ConvertIntergalaticToCredits(string intergalatic)
         {
             var context = new Context<string>(intergalatic);
-            foreach (var expression in IntergalaticExpressionTree)
+            foreach (var expression in _intergalaticExpressions.Union(new[] { new EmptyExpression() }))
             {
                 if (context.Input.Contains(expression.Name()))
                 {
-                    expression.Interpret(context);
+                    expression.Interpret(context, _quotationsDirt);
                     var roman = (decimal) ConvertRomanToCredits(context.Output);
                     return roman * expression.Multiplier(); 
                 }
             }
-            throw new System.Exception();
+            throw new Exception();
         }
     }
 }
