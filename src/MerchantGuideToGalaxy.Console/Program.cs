@@ -22,10 +22,6 @@ namespace MerchantGuideToGalaxy.Console
             System.Console.WriteLine(questionParser.Evaluate("how many Credits is glob prok Iron ?"));
             System.Console.WriteLine(questionParser.Evaluate("how much wood could a woodchuck chuck if a woodchuck could chuck wood ?"));
 
-            System.Console.WriteLine(questionParser.Evaluate("heim ?"));
-            System.Console.WriteLine(questionParser.Evaluate("how much is pish tegj glob glob glob glob ? "));
-            System.Console.WriteLine(questionParser.Evaluate("how many Credits is nothing ?"));
-
             System.Console.ReadKey();
         }
     }
