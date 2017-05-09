@@ -12,7 +12,7 @@ namespace MerchantGuideToGalaxy.Core
     /// </summary>
     public class IntergalaticConverter
     {
-        private readonly IList<IntergalaticExpression> _intergalaticExpressions = new List<IntergalaticExpression>();
+        private readonly IDictionary<string, IntergalaticExpression> _intergalaticExpressions = new Dictionary<string, IntergalaticExpression>();
         private readonly IDictionary<string, string> _quotationsDirt = new Dictionary<string, string>();
 
         private static readonly RomanExpression[] RomanExpressionTree =
@@ -28,7 +28,7 @@ namespace MerchantGuideToGalaxy.Core
             => _quotationsDirt[dirtValue] = romanValue;
 
         public void AddQuotationMetal(string metalValue, decimal multiplier)
-            => _intergalaticExpressions.Add(new CustomExpression(metalValue, multiplier));
+            => _intergalaticExpressions[metalValue] = new CustomExpression(metalValue, multiplier);
 
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace MerchantGuideToGalaxy.Core
         public string ConvertIntergalaticToRoman(string intergalatic)
         {
             var context = new Context<string>(intergalatic);
-            foreach (var customExpression in _intergalaticExpressions)
+            foreach (var customExpression in _intergalaticExpressions.Values)
             {
                 if (context.Input.Contains(customExpression.Name()))
                 {
@@ -68,7 +68,7 @@ namespace MerchantGuideToGalaxy.Core
         /// Retorna fator de cotação do metal
         /// </summary>
         public decimal GetQuotationMetal(string metal)
-            => _intergalaticExpressions.Single(e => e.Name() == metal).Multiplier();
+            => _intergalaticExpressions[metal].Multiplier();
 
         /// <summary>
         /// Retorna verdade se o valor é uma terra
@@ -82,7 +82,7 @@ namespace MerchantGuideToGalaxy.Core
         public decimal ConvertIntergalaticToCredits(string intergalatic)
         {
             var context = new Context<string>(intergalatic);
-            foreach (var expression in _intergalaticExpressions.Union(new[] { new EmptyExpression() }))
+            foreach (var expression in _intergalaticExpressions.Values.Union(new[] { new EmptyExpression() }))
             {
                 if (context.Input.Contains(expression.Name()))
                 {
