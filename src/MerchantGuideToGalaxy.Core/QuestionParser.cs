@@ -65,10 +65,10 @@ namespace MerchantGuideToGalaxy.Core
         /// </summary>
         private string QuestionHowManyCreditsIs(string question)
         {
-            var value = question.Substring(HowMuchIs.Length);
+            var value = question.Substring(HowManyCreditsIs.Length);
             value = value.Substring(0, value.Length - Question.Length);
-            var roman = _intergalaticConverter.ConvertIntergalaticToCredits(value);
-            return $"{value} is {roman}";
+            var roman = (int)_intergalaticConverter.ConvertIntergalaticToCredits(value);
+            return $"{value} is {roman}{Credits}";
         }
 
         /// <summary>
